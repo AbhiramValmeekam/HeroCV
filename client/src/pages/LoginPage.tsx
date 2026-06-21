@@ -50,6 +50,19 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await login({ email: 'demo@herocv.com', password: 'demopass123' });
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Demo login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
       {/* Background glow */}
@@ -128,6 +141,22 @@ const LoginPage: React.FC = () => {
                   <ArrowRight size={18} />
                 </>
               )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              className="btn-secondary w-full justify-center py-3 text-base mt-2 flex items-center gap-2"
+              disabled={loading}
+              id="login-demo"
+              style={{
+                background: 'rgba(99, 102, 241, 0.1)',
+                borderColor: 'rgba(99, 102, 241, 0.2)',
+                color: '#818cf8',
+              }}
+            >
+              <Sparkles size={16} className="text-accent-primary animate-pulse" />
+              Try Demo Account
             </button>
           </form>
 

@@ -57,6 +57,66 @@ export const login = async (
       return;
     }
 
+    // Auto-create/seed demo user if logging in with demo credentials
+    if (email === 'demo@herocv.com') {
+      const demoExists = await User.findOne({ email });
+      if (!demoExists) {
+        const demoUser = await User.create({
+          name: 'Demo User',
+          email: 'demo@herocv.com',
+          password: 'demopass123',
+        });
+
+        // Seed a demo resume
+        const Resume = require('../models/Resume').default;
+        await Resume.create({
+          userId: demoUser._id,
+          title: 'Software Engineer Resume (Demo)',
+          template: 'modern',
+          personalInfo: {
+            fullName: 'Alex Carter',
+            jobTitle: 'Senior Full Stack Engineer',
+            email: 'alex.carter@example.com',
+            phone: '+1 (555) 019-2834',
+            location: 'San Francisco, CA',
+            website: 'https://alexcarter.dev',
+            linkedin: 'linkedin.com/in/alexcarter',
+            github: 'github.com/alexcarter',
+          },
+          summary: 'Experienced Software Engineer with over 5 years of experience building scalable web applications. Specialized in React, Node.js, and cloud architectures. Passionate about writing clean code and improving system performance.',
+          experience: [
+            {
+              company: 'TechCorp Solutions',
+              position: 'Senior Software Engineer',
+              location: 'San Francisco, CA',
+              startDate: 'Jan 2021',
+              endDate: 'Present',
+              current: true,
+              bullets: [
+                'Architected and implemented a high-throughput microservices pipeline, reducing latency by 40%',
+                'Led a team of 4 junior developers to rebuild the legacy admin dashboard using React and TypeScript',
+                'Optimized MongoDB query performance, decreasing database load during peak hours by 25%',
+              ],
+            },
+          ],
+          skills: [
+            { category: 'Languages', items: ['TypeScript', 'JavaScript', 'Python', 'Go', 'SQL'] },
+            { category: 'Frameworks', items: ['React', 'Node.js', 'Express', 'Next.js', 'Django'] },
+          ],
+          education: [
+            {
+              institution: 'Stanford University',
+              degree: 'Bachelor of Science',
+              field: 'Computer Science',
+              startDate: 'Sep 2014',
+              endDate: 'Jun 2018',
+              gpa: '3.8/4.0',
+            },
+          ],
+        });
+      }
+    }
+
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       res.status(401).json({ message: 'Invalid credentials' });
