@@ -2,7 +2,56 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import * as geminiService from '../services/geminiService';
 import Resume from '../models/Resume';
+import User from '../models/User';
 const { PDFParse } = require('pdf-parse') as any;
+
+// Helper to check AI limits for demo user
+const checkDemoLimit = async (
+  req: AuthRequest,
+  res: Response,
+  type: 'generation' | 'analysis'
+): Promise<boolean> => {
+  if (req.user?.email === 'demo@herocv.com') {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return false;
+    }
+    if (type === 'generation') {
+      const count = user.aiGenerationCount || 0;
+      if (count >= 2) {
+        res.status(403).json({
+          message: 'Demo limit reached: You can perform only 2 AI generations on the demo account.'
+        });
+        return false;
+      }
+    } else {
+      const count = user.aiAnalysisCount || 0;
+      if (count >= 2) {
+        res.status(403).json({
+          message: 'Demo limit reached: You can perform only 2 AI analyses on the demo account.'
+        });
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+// Helper to increment AI limits for demo user
+const incrementDemoLimit = async (
+  req: AuthRequest,
+  type: 'generation' | 'analysis'
+): Promise<void> => {
+  if (req.user?.email === 'demo@herocv.com') {
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: {
+        [type === 'generation' ? 'aiGenerationCount' : 'aiAnalysisCount']: 1
+      }
+    });
+  }
+};
+
 
 // @desc    Generate professional summary
 // @route   POST /api/ai/generate-summary
@@ -16,7 +65,11 @@ export const generateSummary = async (
       res.status(400).json({ message: 'Role, skills, and experience are required' });
       return;
     }
+    const isAllowed = await checkDemoLimit(req, res, 'generation');
+    if (!isAllowed) return;
+
     const summary = await geminiService.generateSummary(role, skills, experience);
+    await incrementDemoLimit(req, 'generation');
     res.json({ success: true, summary });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'AI service error' });
@@ -35,7 +88,11 @@ export const enhanceBullet = async (
       res.status(400).json({ message: 'Bullet point is required' });
       return;
     }
+    const isAllowed = await checkDemoLimit(req, res, 'generation');
+    if (!isAllowed) return;
+
     const enhanced = await geminiService.enhanceBulletPoint(bullet, role || '');
+    await incrementDemoLimit(req, 'generation');
     res.json({ success: true, enhanced });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'AI service error' });
@@ -54,7 +111,11 @@ export const suggestSkills = async (
       res.status(400).json({ message: 'Role is required' });
       return;
     }
+    const isAllowed = await checkDemoLimit(req, res, 'generation');
+    if (!isAllowed) return;
+
     const skills = await geminiService.suggestSkills(role, existingSkills || []);
+    await incrementDemoLimit(req, 'generation');
     res.json({ success: true, skills });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'AI service error' });
@@ -73,7 +134,11 @@ export const improveResume = async (
       res.status(400).json({ message: 'Resume data is required' });
       return;
     }
+    const isAllowed = await checkDemoLimit(req, res, 'generation');
+    if (!isAllowed) return;
+
     const improvements = await geminiService.improveResume(resumeData);
+    await incrementDemoLimit(req, 'generation');
     res.json({ success: true, ...improvements });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'AI service error' });
@@ -92,6 +157,9 @@ export const atsAnalyze = async (
       res.status(400).json({ message: 'Resume text is required' });
       return;
     }
+    const isAllowed = await checkDemoLimit(req, res, 'analysis');
+    if (!isAllowed) return;
+
     const analysis = await geminiService.analyzeATS(resumeText);
 
     let savedResumeId = resumeId;
@@ -135,6 +203,7 @@ export const atsAnalyze = async (
       }
     }
 
+    await incrementDemoLimit(req, 'analysis');
     res.json({ success: true, resumeId: savedResumeId, ...analysis });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'AI service error' });
@@ -153,6 +222,9 @@ export const jobMatch = async (
       res.status(400).json({ message: 'Resume text and job description are required' });
       return;
     }
+    const isAllowed = await checkDemoLimit(req, res, 'analysis');
+    if (!isAllowed) return;
+
     const match = await geminiService.matchJobDescription(resumeText, jobDescription);
 
     if (resumeId) {
@@ -167,6 +239,7 @@ export const jobMatch = async (
       );
     }
 
+    await incrementDemoLimit(req, 'analysis');
     res.json({ success: true, ...match });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'AI service error' });
@@ -202,6 +275,9 @@ export const atsAnalyzeFile = async (
       return;
     }
 
+    const isAllowed = await checkDemoLimit(req, res, 'analysis');
+    if (!isAllowed) return;
+
     const analysis = await geminiService.analyzeATS(resumeText);
 
     let savedResumeId = resumeId;
@@ -245,6 +321,7 @@ export const atsAnalyzeFile = async (
       }
     }
 
+    await incrementDemoLimit(req, 'analysis');
     res.json({ success: true, resumeText, resumeId: savedResumeId, ...analysis });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'File analysis failed' });
@@ -309,7 +386,11 @@ export const parseResume = async (
       return;
     }
 
+    const isAllowed = await checkDemoLimit(req, res, 'generation');
+    if (!isAllowed) return;
+
     const parsedData = await geminiService.parseResumeText(text);
+    await incrementDemoLimit(req, 'generation');
     res.json({ success: true, data: parsedData });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'File parsing failed' });

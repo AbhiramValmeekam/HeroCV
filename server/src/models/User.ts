@@ -7,6 +7,8 @@ export interface IUser extends Document {
   password?: string;
   avatar?: string;
   googleId?: string;
+  aiGenerationCount?: number;
+  aiAnalysisCount?: number;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -42,6 +44,14 @@ const userSchema = new Schema<IUser>(
       type: String,
       unique: true,
       sparse: true,
+    },
+    aiGenerationCount: {
+      type: Number,
+      default: 0,
+    },
+    aiAnalysisCount: {
+      type: Number,
+      default: 0,
     },
   },
   {
