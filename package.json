@@ -1,0 +1,14 @@
+{
+  "name": "herocv",
+  "version": "1.0.0",
+  "description": "HeroCV - AI-Powered Resume Builder",
+  "main": "server/dist/server.js",
+  "scripts": {
+    "setup": "npm install --prefix client && npm install --prefix server",
+    "build": "npm run build --prefix client && npm run build --prefix server",
+    "start": "cross-env NODE_ENV=production node server/dist/server.js"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3"
+  }
+}
