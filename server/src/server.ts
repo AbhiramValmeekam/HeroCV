@@ -13,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 import path from 'path';
+import fs from 'fs';
 
 // Middleware
 const allowedOrigins = [
@@ -39,9 +40,26 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+import mongoose from 'mongoose';
+
+// Middleware to ensure DB connection (essential for Vercel Serverless)
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1 && mongoose.connection.readyState !== 2) {
+    try {
+      await connectDB();
+    } catch (err) {
+      return next(err);
+    }
+  }
+  next();
+});
+
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '../../client/dist');
+  const clientBuildPath = fs.existsSync(path.resolve(__dirname, '../../client/dist'))
+    ? path.resolve(__dirname, '../../client/dist')
+    : path.resolve(__dirname, '../../dist');
+    
   app.use(express.static(clientBuildPath));
 
   app.get('*', (req, res) => {
@@ -52,13 +70,19 @@ if (process.env.NODE_ENV === 'production') {
 // Error handler
 app.use(errorHandler);
 
-// Connect to DB and start server
+// Connect to DB and start server (only listen if not on Vercel)
 const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Health check: http://localhost:${PORT}/api/health`);
-  });
+  try {
+    await connectDB();
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Health check: http://localhost:${PORT}/api/health`);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to connect to database:', err);
+  }
 };
 
 startServer().catch((err) => {
@@ -67,3 +91,4 @@ startServer().catch((err) => {
 });
 
 export default app;
+
