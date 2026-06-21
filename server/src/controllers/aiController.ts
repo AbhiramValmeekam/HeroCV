@@ -19,17 +19,17 @@ const checkDemoLimit = async (
     }
     if (type === 'generation') {
       const count = user.aiGenerationCount || 0;
-      if (count >= 2) {
+      if (count >= 3) {
         res.status(403).json({
-          message: 'Demo limit reached: You can perform only 2 AI generations on the demo account.'
+          message: 'Demo limit reached: You can perform only 3 AI generations on the demo account.'
         });
         return false;
       }
     } else {
       const count = user.aiAnalysisCount || 0;
-      if (count >= 2) {
+      if (count >= 3) {
         res.status(403).json({
-          message: 'Demo limit reached: You can perform only 2 AI analyses on the demo account.'
+          message: 'Demo limit reached: You can perform only 3 AI analyses on the demo account.'
         });
         return false;
       }
@@ -37,6 +37,7 @@ const checkDemoLimit = async (
   }
   return true;
 };
+
 
 // Helper to increment AI limits for demo user
 const incrementDemoLimit = async (
