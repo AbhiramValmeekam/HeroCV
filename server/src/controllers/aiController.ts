@@ -3,7 +3,16 @@ import { AuthRequest } from '../middleware/auth';
 import * as geminiService from '../services/geminiService';
 import Resume from '../models/Resume';
 import User from '../models/User';
+// Suppress optional canvas loading warnings from pdf-parse/pdfjs-dist in serverless environments
+const originalWarn = console.warn;
+console.warn = (...args: any[]) => {
+  if (typeof args[0] === 'string' && args[0].includes('Cannot load "@napi-rs/canvas"')) {
+    return;
+  }
+  originalWarn.apply(console, args);
+};
 const { PDFParse } = require('pdf-parse') as any;
+console.warn = originalWarn;
 
 // Helper to check AI limits for demo user
 const checkDemoLimit = async (
