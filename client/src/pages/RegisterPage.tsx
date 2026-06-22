@@ -10,7 +10,7 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register, loginWithGoogle } = useAuth();
+  const { user, register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,7 +63,23 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4 relative">
+      {/* Floating User Info (Top Right) */}
+      {user && (
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-3 bg-bg-secondary/80 border border-border/80 px-4 py-2 rounded-2xl shadow-lg backdrop-blur-md">
+          <div className="hidden sm:flex flex-col text-right min-w-0">
+            <span className="text-xs font-semibold text-text-primary truncate">{user.name}</span>
+            <span className="text-[10px] text-text-muted truncate">{user.email}</span>
+          </div>
+          <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+            {user.name?.charAt(0).toUpperCase() || 'U'}
+          </div>
+          <Link to="/dashboard" className="btn-primary py-1 px-3 text-xs flex items-center gap-1">
+            Dashboard <ArrowRight size={12} />
+          </Link>
+        </div>
+      )}
+
       <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-accent-primary/8 rounded-full blur-3xl"></div>
       <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-accent-secondary/8 rounded-full blur-3xl"></div>
 

@@ -76,9 +76,18 @@ const LandingPage: React.FC = () => {
           </Link>
           <div className="flex items-center gap-4">
             {user ? (
-              <Link to="/dashboard" className="btn-primary" id="go-to-dashboard">
-                Dashboard <ArrowRight size={16} />
-              </Link>
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex flex-col text-right min-w-0">
+                  <span className="text-sm font-semibold text-text-primary truncate">{user.name}</span>
+                  <span className="text-xs text-text-muted truncate">{user.email}</span>
+                </div>
+                <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                  {user.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <Link to="/dashboard" className="btn-primary py-2 px-4 text-sm flex items-center gap-1.5" id="go-to-dashboard">
+                  Dashboard <ArrowRight size={14} />
+                </Link>
+              </div>
             ) : (
               <>
                 <Link to="/login" className="btn-ghost" id="login-nav-link">
