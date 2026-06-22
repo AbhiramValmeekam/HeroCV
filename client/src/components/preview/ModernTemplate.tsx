@@ -11,22 +11,24 @@ const ModernTemplate: React.FC<TemplateProps> = ({ resume }) => {
   return (
     <div className="resume-page" style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
-      <div style={{ marginBottom: '16px', borderBottom: '3px solid #6366F1', paddingBottom: '16px' }}>
-        <h1 style={{ fontSize: '28pt', color: '#1a1a1a', marginBottom: '4px', letterSpacing: '-0.5px' }}>
-          {personalInfo.fullName || 'Your Name'}
-        </h1>
-        {personalInfo.jobTitle && (
-          <p style={{ fontSize: '14pt', color: '#6366F1', fontWeight: 500, marginBottom: '8px' }}>
-            {personalInfo.jobTitle}
-          </p>
-        )}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', fontSize: '9pt', color: '#64748b' }}>
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>• {personalInfo.phone}</span>}
-          {personalInfo.location && <span>• {personalInfo.location}</span>}
-          {personalInfo.linkedin && <span>• {personalInfo.linkedin}</span>}
-          {personalInfo.github && <span>• {personalInfo.github}</span>}
-          {personalInfo.website && <span>• {personalInfo.website}</span>}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', borderBottom: '3px solid #6366F1', paddingBottom: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '28pt', color: '#1a1a1a', marginBottom: '4px', letterSpacing: '-0.5px', marginTop: 0 }}>
+            {personalInfo.fullName || 'Your Name'}
+          </h1>
+          {personalInfo.jobTitle && (
+            <p style={{ fontSize: '14pt', color: '#6366F1', fontWeight: 500, marginBottom: 0 }}>
+              {personalInfo.jobTitle}
+            </p>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', fontSize: '9.5pt', color: '#64748b', textAlign: 'right', marginTop: '6px' }}>
+          {personalInfo.email && <span style={{ fontWeight: 500, color: '#1a1a1a' }}>{personalInfo.email}</span>}
+          {personalInfo.phone && <span>{personalInfo.phone}</span>}
+          {personalInfo.location && <span>{personalInfo.location}</span>}
+          {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
+          {personalInfo.github && <span>{personalInfo.github}</span>}
+          {personalInfo.website && <span>{personalInfo.website}</span>}
         </div>
       </div>
 
