@@ -58,13 +58,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       {/* Sidebar */}
       <aside className={`sidebar ${isOpen ? 'open' : ''}`} id="main-sidebar">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 mb-8">
+        <div className="flex items-center gap-3 px-4 mb-4">
           <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
             <Sparkles size={20} className="text-white" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-text-primary">HeroCV</h1>
             <p className="text-xs text-text-muted">AI Resume Builder</p>
+          </div>
+        </div>
+
+        {/* User Profile Info (Top-Left) */}
+        <div className="flex items-center gap-3 px-4 py-3 mb-6 bg-bg-secondary/40 border border-border/60 rounded-xl mx-2">
+          <div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-text-primary truncate" id="sidebar-user-name">{user?.name}</p>
+            <p className="text-xs text-text-muted truncate" id="sidebar-user-email">{user?.email}</p>
           </div>
         </div>
 
@@ -88,17 +99,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           })}
         </nav>
 
-        {/* User section */}
-        <div className="border-t border-border pt-4 mt-4">
-          <div className="flex items-center gap-3 px-4 mb-3">
-            <div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center text-white font-semibold text-sm">
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text-primary truncate">{user?.name}</p>
-              <p className="text-xs text-text-muted truncate">{user?.email}</p>
-            </div>
-          </div>
+        {/* Logout at bottom */}
+        <div className="border-t border-border pt-4 mt-auto">
           <button
             onClick={handleLogout}
             className="sidebar-link w-full text-left hover:text-accent-danger"
