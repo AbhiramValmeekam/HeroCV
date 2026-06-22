@@ -12,6 +12,7 @@ console.warn = (...args: any[]) => {
   originalWarn.apply(console, args);
 };
 const { PDFParse } = require('pdf-parse') as any;
+PDFParse.setWorker(require.resolve('pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs'));
 console.warn = originalWarn;
 
 // Helper to check AI limits for demo user
