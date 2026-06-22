@@ -276,7 +276,7 @@ export const atsAnalyzeFile = async (
       req.file.buffer.byteOffset,
       req.file.buffer.byteLength
     );
-    const pdf = new PDFParse(uint8Array);
+    const pdf = new PDFParse({ data: uint8Array });
     const parsed = await pdf.getText();
     const resumeText = parsed.text;
 
@@ -355,7 +355,7 @@ export const extractText = async (
       req.file.buffer.byteOffset,
       req.file.buffer.byteLength
     );
-    const pdf = new PDFParse(uint8Array);
+    const pdf = new PDFParse({ data: uint8Array });
     const parsed = await pdf.getText();
     const text = parsed.text;
 
@@ -387,7 +387,7 @@ export const parseResume = async (
       req.file.buffer.byteOffset,
       req.file.buffer.byteLength
     );
-    const pdf = new PDFParse(uint8Array);
+    const pdf = new PDFParse({ data: uint8Array });
     const parsed = await pdf.getText();
     const text = parsed.text;
 
